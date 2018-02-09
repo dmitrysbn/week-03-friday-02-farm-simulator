@@ -52,10 +52,10 @@ class Farm
   end
 
   def add_new_field
-    puts "What kind of field is it: corn or wheat?"
+    puts "What kind of field is it: corn, wheat, or weed?"
     input_type = gets.chomp.downcase
 
-    while input_type != "corn" && input_type != "wheat"
+    while input_type != "corn" && input_type != "wheat" && input_type != "weed"
       invalid_input("field type")
       input_type = gets.chomp.downcase
     end
@@ -63,16 +63,14 @@ class Farm
     type = input_type
 
     puts "How large is the field in hectares?"
-    input_area = gets.chomp
+    input_area = gets.chomp.to_i
 
-    begin
-      area = input_area.to_i
-    rescue
-      # invalid_input("field area")
-      input_area = gets.chomp
-      retry
-    else area = input_area.to_i
+    while input_area == 0
+      invalid_input("field area")
+      input_area = gets.chomp.to_i
     end
+
+    area = input_area
 
     # area = input_area.to_i
 
@@ -94,7 +92,7 @@ class Farm
       end
 
       @total_food_ever += total_harvest
-      puts "The farm has #{total_food_ever} harvested food so far."
+      puts "The farm has #{total_food_ever} harvested 'food' so far."
     end
   end
 
@@ -105,25 +103,28 @@ class Farm
     puts "The farm has #{@total_food_ever} harvested food so far."
   end
 
+  def collect_area(type)
+    total_type_hectares = 0
+    @fields.each do |field|
+      if field.type == type
+        total_type_hectares += field.area
+      end
+    end
+    return total_type_hectares
+  end
+
   def relax
-    total_corn_hectares = 0
-    corn_fields = @fields.select do |field|
-      field.type == "corn"
-    end
-    corn_fields.each do |field|
-      total_corn_hectares += field.area
+    unless collect_area("corn") == 0
+      puts "#{collect_area("corn")} hectares of tall green stalks rustling in the breeze fill your horizon."
     end
 
-    total_wheat_hectares = 0
-    wheat_fields = @fields.select do |field|
-      field.type == "wheat"
-    end
-    wheat_fields.each do |field|
-      total_wheat_hectares += field.area
+    unless collect_area("wheat") == 0
+      puts "The sun hangs low, casting an orange glow on a sea of #{collect_area("wheat")} hectares of wheat."
     end
 
-    puts "#{total_corn_hectares} hectares of tall green stalks rustling in the breeze fill your horizon."
-    puts "The sun hangs low, casting an orange glow on a sea of #{total_wheat_hectares} hectares of wheat."
+    unless collect_area("weed") == 0
+      puts "Something doesn't feel quite the same. You can't put your finger on it, but your mind is somehow at ease overlooking the #{collect_area("weed")} hectares of weed."
+    end
   end
 
   def invalid_input(context)
@@ -141,7 +142,5 @@ class Farm
 end
 
 farm = Farm.new
-field1 = Field.new("corn", 1000)
-field2 = Field.new("wheat", 1000)
 
 farm.main_menu
