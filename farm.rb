@@ -46,14 +46,36 @@ class Farm
       puts "Exiting..."
       sleep(2)
       exit
+    else
+      invalid_input("main menu")
     end
   end
 
   def add_new_field
     puts "What kind of field is it: corn or wheat?"
-    type = gets.chomp.downcase
+    input_type = gets.chomp.downcase
+
+    while input_type != "corn" && input_type != "wheat"
+      invalid_input("field type")
+      input_type = gets.chomp.downcase
+    end
+
+    type = input_type
+
     puts "How large is the field in hectares?"
-    area = gets.chomp.to_i
+    input_area = gets.chomp
+
+    begin
+      area = input_area.to_i
+    rescue
+      # invalid_input("field area")
+      input_area = gets.chomp
+      retry
+    else area = input_area.to_i
+    end
+
+    # area = input_area.to_i
+
     puts "Added a #{type} field of #{area} hectares!"
 
     new_field = Field.new(type, area)
@@ -70,8 +92,9 @@ class Farm
         puts "Harvesting #{field.food} from a #{field.area} hectare #{field.type} field."
         total_harvest += field.food
       end
-    @total_food_ever += total_harvest
-    puts "The farm has #{total_food_ever} harvested food so far."
+
+      @total_food_ever += total_harvest
+      puts "The farm has #{total_food_ever} harvested food so far."
     end
   end
 
@@ -101,6 +124,18 @@ class Farm
 
     puts "#{total_corn_hectares} hectares of tall green stalks rustling in the breeze fill your horizon."
     puts "The sun hangs low, casting an orange glow on a sea of #{total_wheat_hectares} hectares of wheat."
+  end
+
+  def invalid_input(context)
+    if context == 'main menu'
+      puts "Invalid option, try again:"
+
+    elsif context == "field type"
+      puts "Invalid field type, try again:"
+
+    elsif context == "field area"
+      puts "Invalid area, try using whole numbers:"
+    end
   end
 
 end
